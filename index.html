@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      function updateCaretPosition() {
+        var ctl = document.getElementById('Javascript_example');
+        var startPos = ctl.selectionStart;
+        var endPos = ctl.selectionEnd;
+        console.log(startPos + ", " + endPos);
+      }
+
+      window.onload = function() {
+        var inputField = document.getElementById('Javascript_example');
+        inputField.addEventListener('input', updateCaretPosition);
+        inputField.addEventListener('click', updateCaretPosition);
+        inputField.addEventListener('keyup', updateCaretPosition);
+      };
+    </script>
+  </head>
+  <body>
+    <input id="Javascript_example" name="one" type="text" value="Javascript example">
+  </body>
+</html>
