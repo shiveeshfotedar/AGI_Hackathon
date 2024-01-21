@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Context Menu with Image Drop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .custom-context-menu {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 250px;
+        }
+
+        .drop-area {
+            border: 2px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            margin-top: 10px;
+            height: 150px;
+            overflow: auto;
+        }
+
+        .drop-area img {
+            max-width: 150px;
+            max-height: 150px;
+            display: none; /* Hide the image itself */
+        }
+
+        .checkmark {
+            color: green;
+            font-size: 20px;
+            display: none;
+        }
+
+        .base64-display {
+            margin-top: 10px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div id="customContextMenu" class="custom-context-menu">
+        <input type="text" id="textInput" placeholder="Enter text here">
+        <div id="dropArea" class="drop-area">
+            Drop images here
+            <span id="checkmark" class="checkmark">&#10004;</span> <!-- Checkmark -->
+        </div>
+        <textarea id="base64Image" class="base64-display" rows="4" placeholder="Base64 encoded image will appear here"></textarea>
+        <button id="enterButton">Enter</button>
+
+
+    </div>
+    <img src="image/sample.jpeg" alt="Checkmark">
+    <script>
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            var contextMenu = document.getElementById("customContextMenu");
+            contextMenu.style.top = event.pageY + "px";
+            contextMenu.style.left = event.pageX + "px";
+            contextMenu.style.display = "block";
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.matches('#textInput, #customContextMenu, #customContextMenu *')) {
+                document.getElementById("customContextMenu").style.display = "none";
+            }
+        });
+
+        var textInput = document.getElementById('textInput');
+        var dropArea = document.getElementById('dropArea');
+        var base64ImageTextArea = document.getElementById('base64Image');
+        var enteredData = {
+            text: '',
+            files: []
+        };
+
+        textInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                triggerUpload();
+            }
+        });
+
+        dropArea.addEventListener('dragover', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+        });
+
+        dropArea.addEventListener('drop', function(event) {
+            event.stopPropagation();
+            event.preventDefault();
+            var files = event.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var base64Image = e.target.result;
+                    document.getElementById("base64Image").value = base64Image; // Add base64 to text box
+                    document.getElementById("checkmark").style.display = 'inline'; // Show checkmark
+                };
+                reader.readAsDataURL(files[0]); // Convert the first image to base64
+            }
+        });
+
+
+        document.getElementById('enterButton').addEventListener('click', triggerUpload);
+
+        function triggerUpload() {
+            enteredData.text = textInput.value;
+            uploadData(enteredData);
+            document.getElementById("customContextMenu").style.display = "none";
+        }
+
+        function uploadData(data) {
+            console.log('Uploading', data);
+            // Implement server-side upload logic here
+            // Use 'data.files' which contains the base64 encoded images
+        }
+
+        
+    </script>
+</body>
+</html>
