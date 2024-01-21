@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Custom Context Menu</title>
+    <style>
+        html{
+            cursor: crosshair;
+        }
+        .context-menu {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .content {
+            /* Your content styling */
+            
+        }
+    </style>
+</head>
+<body>
+
+<div id="myMenu" class="context-menu" ondragover="allowDrop(event)" ondrop="drop(event)">
+    <!-- Content will be filled by JavaScript -->
+    <input type="text" name="title" placeholder="Title" id="search-box">
+    <div id="context_data">
+
+    </div> 
+    <div id="context_img">
+
+    </div> 
+</div>
+
+<div class="content">
+    <p>Sample Text</p>
+    <div>Another Element</div>
+    <!-- More content here -->
+    <img id="dragImage" ondragstart="dragStart(event)" ondrag="dragging(event)" draggable="true" src="https://via.placeholder.com/150" alt="Placeholder Image">
+</div>
+
+
+<script>
+    function clearSelection()
+            {
+            if (window.getSelection) {window.getSelection().removeAllRanges();}
+            else if (document.selection) {document.selection.empty();}
+            }
+    document.addEventListener('mousemove', function(e) {
+        let myMenu = document.getElementById('myMenu');
+        myMenu.style.left = e.pageX + 'px';
+        myMenu.style.top = e.pageY + 20 + 'px';
+    });
+
+    document.addEventListener('click', function(e) {
+     let myMenu = document.querySelector('#context_data');
+        let targetElement = e.target;
+        console.log(document.getSelection().toString());
+        // Display info about the target element
+        if(document.getSelection().toString() != ""){
+            myMenu.innerHTML = document.getSelection().toString();
+        }
+        else {
+            myMenu.innerHTML = 'No target element selected';
+        }
+        
+    });
+
+    document.addEventListener('dblclick', function(e) {
+        let myMenu = document.querySelector('#context_data');
+        let myImg = document.querySelector('#context_img');
+        console.log("Double Clicked");       
+        myMenu.innerHTML = ""; 
+        myImg.innerHTML = "";
+    });
+
+
+    function dragStart(event) {
+        clearSelection();
+        event.dataTransfer.setData("Text", event.target.id);
+}
+
+    function dragging(event) {
+        console.log("The text is being dragged.");
+    }
+
+    function allowDrop(event) {
+        event.preventDefault();
+
+    }
+
+    // when press option key  and 'H' key the focus goes to the search box
+    document.addEventListener('keydown', function(e) {
+        if (e.keyCode == 72 && e.altKey) {
+            e.preventDefault();
+            document.getElementById('search-box').focus();
+        }
+    });
+
+
+        function drop(event) {
+            event.preventDefault();
+            const data = event.dataTransfer.getData("Text");
+            const original = document.getElementById(data);
+
+            if (original) {
+                const myMenu = document.getElementById('context_img');
+                const selectedText = window.getSelection().toString();
+                const clone = original.cloneNode(true); // Create a copy of the element
+
+                // Append the selected text if any
+                if (selectedText) {
+                    myMenu.innerHTML += selectedText + '<br>';
+                }
+
+                // Append the copied image
+                myMenu.appendChild(clone);
+            }
+    }
+
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        let myMenu = document.getElementById('myMenu');
+        document.getElementById('search-box').focus();
+        console.log("Right Clicked");
+    });
+</script>
+
+</body>
+</html>

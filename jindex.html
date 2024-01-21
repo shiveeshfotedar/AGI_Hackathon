@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #contextMenu {
+        display: none;
+        position: absolute;
+        z-index: 1000;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        padding: 5px;
+      }
+    </style>
+    <script>
+      var previousCaretPos = null;
+      var selectedText = "";
+
+      function updateCaretPosition(e) {
+        var ctl = document.getElementById('Javascript_example');
+        var caretPos = ctl.selectionStart;
+        var endPos = ctl.selectionEnd;
+
+        // Check if the caret position has changed
+        if (caretPos !== previousCaretPos) {
+          // Update the previous position
+          previousCaretPos = caretPos;
+
+          // Show context menu at caret position
+          showContextMenu(e);
+
+          // Update and display the selected text if any
+          if (caretPos !== endPos) {
+            selectedText = ctl.value.substring(caretPos, endPos);
+            document.getElementById('selectedText').textContent = "Selected: " + selectedText;
+          } else {
+            document.getElementById('selectedText').textContent = "";
+          }
+        }
+      }
+
+      function getCaretCoordinates() {
+        var x = 0, y = 0;
+        var ctl = document.getElementById('Javascript_example');
+        var caretPos = ctl.selectionStart;
+        var textArea = ctl.cloneNode();
+        textArea.style.visibility = 'hidden';
+        document.body.appendChild(textArea);
+        textArea.value = ctl.value.substring(0, caretPos);
+        x = textArea.scrollWidth;
+        y = textArea.scrollHeight;
+        document.body.removeChild(textArea);
+        return { x: x, y: y };
+      }
+
+      function showContextMenu(e) {
+        var contextMenu = document.getElementById('contextMenu');
+        var caretCoords = getCaretCoordinates();
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = (e.target.offsetLeft + caretCoords.x) + 'px';
+        contextMenu.style.top = (e.target.offsetTop + caretCoords.y) + 'px';
+      }
+
+      function hideContextMenu() {
+        var contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'none';
+      }
+
+      window.onload = function() {
+        var inputField = document.getElementById('Javascript_example');
+        inputField.addEventListener('input', updateCaretPosition);
+        inputField.addEventListener('click', updateCaretPosition);
+        inputField.addEventListener('keyup', updateCaretPosition);
+
+        // Hide context menu on click outside
+        document.addEventListener('click', function(event) {
+          var isClickInsideElement = inputField.contains(event.target);
+          if (!isClickInsideElement) {
+            hideContextMenu();
+          }
+        });
+      };
+    </script>
+  </head>
+  <body>
+    <textarea id="Javascript_example" name="one" type="text">Javascript example</textarea>
+    <div id="contextMenu">
+      <p id="selectedText"></p>
+    </div>
+  </body>
+</html>

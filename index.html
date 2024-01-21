@@ -2,11 +2,21 @@
 <html>
   <head>
     <script>
+      var previousStartPos = null;
+      var previousEndPos = null;
+
       function updateCaretPosition() {
         var ctl = document.getElementById('Javascript_example');
         var startPos = ctl.selectionStart;
         var endPos = ctl.selectionEnd;
-        console.log(startPos + ", " + endPos);
+
+        // Check if either the start or end positions have changed
+        if (startPos !== previousStartPos || endPos !== previousEndPos) {
+          console.log(startPos + ", " + endPos);
+          // Update the previous positions
+          previousStartPos = startPos;
+          previousEndPos = endPos;
+        }
       }
 
       window.onload = function() {
@@ -18,6 +28,6 @@
     </script>
   </head>
   <body>
-    <input id="Javascript_example" name="one" type="text" value="Javascript example">
+    <textarea id="Javascript_example" name="one" type="text" value="Javascript example"></textarea>
   </body>
 </html>
